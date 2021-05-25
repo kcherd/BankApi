@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New card</title>
+    <script>
+        function  onClick(){
+            let form = document.forms["f1"];
+            let fd = new FormData(form);
+            let data = {};
+            for (let [key, prop] of fd) {
+                data[key] = prop;
+            }
+            data = JSON.stringify(data, null, 2);
+
+            let xmlhttp;
+            xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("POST", "http://localhost:8080/client/new/result", true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(data);
+        }
+    </script>
+</head>
+<body>
+<p>Create a new card</p>
+<form name="f1">
+    <p>Passport</p>
+    <input type="text" name="passport"><br>
+    <p>Account</p>
+    <input type="text" name="acc"><br>
+    <p><input type="submit" onclick="onClick()"></p>
+</form>
+</body>
+</html>

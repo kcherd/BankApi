@@ -1,0 +1,22 @@
+insert into clients values (1, 'Иванов Иван Иванович', '1234567890');
+insert into clients values (2, 'Петров Петр Петрович', '0987654321');
+insert into clients values (3, 'Сидоров Андрей Викторович', '5674832916');
+insert into clients values (4, 'Мазаненко Анна Олеговна', '8564539271');
+insert into clients values (5, 'Михайлова Ирина Игоревна', '9876546372');
+insert into clients values (6, 'Васильева Анфиса Геннадьевна', '9944663322');
+insert into clients values (7, 'Антонов Максим Николайевич', '4637483690');
+
+insert into bank_account values (1, '12345678901234567890', 1000, 1);
+insert into bank_account values (2, '09876543210987654321', 120000, 1);
+insert into bank_account values (3, '12345678901214567890', 1543, 2);
+insert into bank_account values (4, '12345678901234567891', 85743, 2);
+insert into bank_account values (5, '12345678901239567890', 200000, 3);
+insert into bank_account values (6, '12345678941234567890', 49385, 3);
+insert into bank_account values (7, '12345678101239567890', 453245, 4);
+
+insert into cards values (1, 1234567890123456, 1);
+insert into cards values (2, 1234567890123457, 2);
+insert into cards values (3, 1234567890123458, 3);
+insert into cards values (4, 1234567890123459, 4);
+insert into cards values (5, 1234567890123450, 5);
+insert into cards values (6, 1234567890123451, 5);
