@@ -1,6 +1,7 @@
 package controller;
 
 import com.sun.net.httpserver.HttpServer;
+import dao.DBConnect;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.IOException;
@@ -15,6 +16,9 @@ public class BankServer {
     private static HttpServer server;
     private static JdbcConnectionPool connectionPool;
 
+    /**
+     *  Приватный конструктор класса, чтобы создавать только один экземпляр сервера
+     */
     BankServer(){ }
 
     /**
@@ -23,13 +27,13 @@ public class BankServer {
      */
     public static void startServer(){
         try {
+            connectionPool = DBConnect.getConnectionPool();
+
             server = HttpServer.create();
             server.bind(new InetSocketAddress(8080), 10);
-            server.createContext("/", new OperationHandler());
-            server.createContext("/client", new ClientHandler());
+            server.createContext("/", new GetHandler());
+            server.createContext("/client", new PostHandler());
             server.start();
-
-            connectionPool = DBConnect.getConnectionPool();
         }catch (IOException e){
             e.printStackTrace();
         }

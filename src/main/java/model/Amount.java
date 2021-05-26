@@ -1,5 +1,10 @@
 package model;
 
+import java.util.Objects;
+
+/**
+ * класс для параметро запроса
+ */
 public class Amount implements InData{
     String passport;
     double amount;
@@ -35,5 +40,18 @@ public class Amount implements InData{
 
     public void setAccount(String account) {
         this.account = account;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Amount amount1 = (Amount) o;
+        return Double.compare(amount1.amount, amount) == 0 && Objects.equals(passport, amount1.passport) && Objects.equals(account, amount1.account);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(passport, amount, account);
     }
 }

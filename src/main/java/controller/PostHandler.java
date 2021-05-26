@@ -1,6 +1,5 @@
 package controller;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import model.Account;
 import model.Amount;
@@ -8,14 +7,29 @@ import model.InData;
 import model.Passport;
 
 import java.io.*;
+import java.sql.Connection;
 
-public class ClientHandler extends Handlers{
-    private final Gson gson = new Gson();
+/**
+ * Класс для обработки post запросов
+ */
+public class PostHandler extends Handlers{
 
+    /**
+     * Конструктор - наследует радительский конструктор
+     */
+    public PostHandler(){
+        super();
+    }
+
+    public PostHandler(Connection connection) {super(connection);}
+
+    /**
+     * процедура, обрабатывающия http запросы
+     * @param exchange
+     */
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange){
         String url = exchange.getRequestURI().toString();
-        ApiMethods apiMethods = new ApiMethods();
 
         switch (url){
             case "/client":
@@ -35,14 +49,15 @@ public class ClientHandler extends Handlers{
                 break;
             case "/client/new/result":
                 try {
-                    out(exchange, String.valueOf(apiMethods.newCard((Account) parseInputStream(exchange, new Account()))));
+                    String result = newCard((Account) parseInputStream(exchange, new Account()));
+                    out(exchange, result);
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
                 break;
             case "/client/cards/result":
                 try {
-                    String res = apiMethods.allCards((Passport) parseInputStream(exchange, new Passport()));
+                    String res = allCards((Passport) parseInputStream(exchange, new Passport()));
                     out(exchange, res);
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
@@ -50,14 +65,16 @@ public class ClientHandler extends Handlers{
                 break;
             case "/client/balance/result":
                 try {
-                    out(exchange, String.valueOf(apiMethods.balance((Account) parseInputStream(exchange, new Account()))));
+                    String result = balance((Account) parseInputStream(exchange, new Account()));
+                    out(exchange, result);
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
                 break;
             case "/client/deposit/result":
                 try{
-                    out(exchange, String.valueOf(apiMethods.deposit((Amount) parseInputStream(exchange, new Amount()))));
+                    String result = deposit((Amount) parseInputStream(exchange, new Amount()));
+                    out(exchange, result);
                 }catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
@@ -67,7 +84,14 @@ public class ClientHandler extends Handlers{
         }
     }
 
-    private InData parseInputStream(HttpExchange exchange, InData format) throws IOException {
+    /**
+     * Функция парсинга тела POST запросов в объекты классов Account, Amount, Passport
+     * @param exchange
+     * @param format классб в который нужно преобразовать тело запроса
+     * @return объект класса Account/Amount/Passport
+     * @throws IOException
+     */
+    public InData parseInputStream(HttpExchange exchange, InData format) throws IOException {
         InputStream inputStream = exchange.getRequestBody();
         System.out.println(exchange.getRequestBody());
         int ch;
@@ -81,20 +105,20 @@ public class ClientHandler extends Handlers{
         return format;
     }
 
-    private void showHTML(HttpExchange exchange, String name){
+    /**
+     * процедура вывода html страниц
+     * @param exchange
+     * @param name название страницы
+     */
+    public void showHTML(HttpExchange exchange, String name){
         StringBuilder stringBuilder = new StringBuilder();
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader(name))){
             String file;
             while ((file = bufferedReader.readLine()) != null){
                 stringBuilder.append(file);
             }
-            exchange.getResponseHeaders().set("Content-type", "text/html");
-            exchange.sendResponseHeaders(200, 0);
-            OutputStream outputStream = exchange.getResponseBody();
 
-            outputStream.write(stringBuilder.toString().getBytes());
-            outputStream.flush();
-            outputStream.close();
+            out(exchange, stringBuilder.toString(), "text/html");
         } catch (IOException e){
             errorAnswer(exchange, e.getMessage());
         }

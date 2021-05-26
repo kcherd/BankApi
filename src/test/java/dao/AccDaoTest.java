@@ -1,6 +1,5 @@
 package dao;
 
-import controller.DBConnect;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +18,7 @@ public class AccDaoTest {
     }
 
     @Test
-    public void checkBalance() throws SQLException {
+    public void checkBalance() throws Exception {
         double actual = 1000;
         double expected = accDao.checkBalance("12345678901234567890");
 
@@ -27,31 +26,27 @@ public class AccDaoTest {
     }
 
     @Test
-    public void depositOfFunds_TRUE() throws SQLException {
+    public void depositOfFunds_TRUE() throws Exception {
         boolean expected = accDao.depositOfFunds(555, "12345678901234567890");
 
         Assert.assertTrue(expected);
     }
 
-    @Test
-    public void depositOfFunds_FALSE() throws SQLException {
-        boolean expected = accDao.depositOfFunds(555, "12345678901234457890");
-
-        Assert.assertFalse(expected);
+    @Test(expected = Exception.class)
+    public void depositOfFunds_Exception() throws Exception{
+        accDao.depositOfFunds(-1, "12345678901234567890");
     }
 
     @Test
-    public void newCard_TRUE() throws SQLException {
+    public void newCard_TRUE() throws Exception {
         boolean expected = accDao.newCard("12345678901234567890");
 
         Assert.assertTrue(expected);
     }
 
-    @Test
-    public void newCard_FALSE() throws SQLException {
-        boolean expected = accDao.newCard("12345678901234567811");
-
-        Assert.assertFalse(expected);
+    @Test(expected = Exception.class)
+    public void newCard_Exception() throws Exception{
+        accDao.newCard("1234567890123456789");
     }
 
     @Test

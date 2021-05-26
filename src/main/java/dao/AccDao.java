@@ -22,10 +22,10 @@ public class AccDao {
      * @param accNum номер счета
      * @return баланс
      */
-    public double checkBalance(String accNum) throws SQLException {
-        double balance = 0;
+    public double checkBalance(String accNum) throws Exception {
+        double balance = -1;
         PreparedStatement statement = connection.prepareStatement("select balance from bank_account where num = ?");
-        statement.setString(1,accNum);
+        statement.setString(1, accNum);
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()){
@@ -34,7 +34,11 @@ public class AccDao {
         resultSet.close();
         statement.close();
 
-        return balance;
+        if(balance > 0) {
+            return balance;
+        }else{
+            throw new Exception("Failed to check balance");
+        }
     }
 
     /**
@@ -43,13 +47,13 @@ public class AccDao {
      * @param accNum номер счета
      * @return true - если операция удалась, false в противном случае
      */
-    public boolean depositOfFunds(double amount, String accNum) throws SQLException {
+    public boolean depositOfFunds(double amount, String accNum) throws Exception {
         if(amount < 0){
-            return false;
+            throw new Exception("Amount < 0");
         }
         double balance = checkBalance(accNum);
         double newBalance = balance + amount;
-        int result = 0;
+        int result;
 
         PreparedStatement preparedStatement = connection.prepareStatement("update bank_account set balance = ? where num = ?");
         preparedStatement.setDouble(1, newBalance);
@@ -58,7 +62,11 @@ public class AccDao {
 
         preparedStatement.close();
 
-        return result == 1;
+        if(result == 1){
+            return true;
+        } else{
+            throw new Exception("Failed to deposit funds into account");
+        }
     }
 
     /**
@@ -66,14 +74,15 @@ public class AccDao {
      * @param accNum номер счета
      * @return true - если операция удалась, false в противном случае
      */
-    public boolean newCard(String accNum) throws SQLException {
+    public boolean newCard(String accNum) throws Exception {
 
         //проверем номер счета
         long accId = findAccByNum(accNum);
         if (accId < 0){
-            return false;
+            throw new Exception("Account does not exist");
         }
 
+        //диапазон значений для номера карты
         long min = 1000000000000000L;
         long max = 9000000000000000L;
         Random r = new Random();
@@ -91,10 +100,14 @@ public class AccDao {
         PreparedStatement preparedStatement = connection.prepareStatement("insert into cards (num, acc_id) values (?, ?)");
         preparedStatement.setLong(1,number);
         preparedStatement.setLong(2, accId);
-        preparedStatement.executeUpdate();
+        int result = preparedStatement.executeUpdate();
         preparedStatement.close();
 
-        return true;
+        if(result > 0) {
+            return true;
+        }else{
+            throw new Exception("Failed to create card");
+        }
     }
 
     /**

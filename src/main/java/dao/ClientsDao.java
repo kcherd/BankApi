@@ -34,7 +34,7 @@ public class ClientsDao {
      * @param passport серия и номер пасспорта
      * @return идентификатор клиента или -1, если такой клиент не зарегистрирован
      */
-    private long checkClient(String passport) throws SQLException {
+    private long checkClient(String passport) throws Exception {
         long id = -1;
         PreparedStatement preparedStatement = connection.prepareStatement("select * from clients where passport_id = ?");
         preparedStatement.setString(1, passport);
@@ -86,7 +86,11 @@ public class ClientsDao {
         resultSet.close();
         preparedStatement.close();
 
-        return cards;
+        if(cards.size() > 0) {
+            return cards;
+        }else{
+            throw new Exception("The user does not have any cards");
+        }
     }
 
     /**

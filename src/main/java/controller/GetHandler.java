@@ -5,44 +5,62 @@ import model.Account;
 import model.Amount;
 import model.Passport;
 
+import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class OperationHandler extends Handlers{
+/**
+ * Класс для обработки get запросов
+ */
+public class GetHandler extends Handlers{
 
+    /**
+     * констрактор - вызывает контсруктор родителя
+     */
+    public GetHandler(){
+        super();
+    }
+
+    public GetHandler(Connection connection){
+        super(connection);
+    }
+
+    /**
+     * метод обработки http запросов
+     * @param exchange
+     */
     @Override
     public void handle(HttpExchange exchange) {
         String url = exchange.getRequestURI().toString();
         String query = exchange.getRequestURI().getQuery();
-        ApiMethods apiMethods = new ApiMethods();
 
         switch (action(url)){
             case "new":
                 try {
-                    out(exchange, String.valueOf(apiMethods.newCard(parsQueryToAccount(query))));
+                    out(exchange, newCard(parsQueryToAccount(query)));
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
                 break;
             case "cards":
                 try {
-                    out(exchange, apiMethods.allCards(parsQueryToPassport(query)));
+                    out(exchange, allCards(parsQueryToPassport(query)));
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
                 break;
             case "balance":
                 try {
-                    out(exchange, String.valueOf(apiMethods.balance(parsQueryToAccount(query))));
+                    out(exchange, balance(parsQueryToAccount(query)));
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
                 break;
             case "deposit":
                 try {
-                    out(exchange, String.valueOf(apiMethods.deposit(parsQueryToAmount(query))));
+                    out(exchange, deposit(parsQueryToAmount(query)));
                 } catch (Exception e) {
                     errorAnswer(exchange, e.getMessage());
                 }
@@ -61,25 +79,36 @@ public class OperationHandler extends Handlers{
         Map<String, String> result = new HashMap<>();
         for (String param : query.split("&")) {
             String[] entry = param.split("=");
-            if (entry.length > 1) {
-                result.put(entry[0], entry[1]);
-            }else{
-                result.put(entry[0], "");
-            }
+            result.put(entry[0], entry[1]);
         }
         return result;
     }
 
+    /**
+     * Функция парсинга параметров запроса в объект класса Passport
+     * @param query параметры запроса
+     * @return объект класса Passport с параметрами запроса
+     */
     public Passport parsQueryToPassport(String query){
         Map<String, String> map = queryToMap(query);
         return new Passport(map.get("passport"));
     }
 
+    /**
+     * Функция парсинга параметров запроса в объект класса Account
+     * @param query параметры запроса
+     * @return объект класса Account с параметрами запроса
+     */
     public Account parsQueryToAccount(String query){
         Map<String, String> map = queryToMap(query);
         return new Account(map.get("passport"), map.get("account"));
     }
 
+    /**
+     * Функция парсинга параметров запроса в объект класса Amount
+     * @param query параметры запроса
+     * @return объект класса Amount с параметрами запроса
+     */
     public Amount parsQueryToAmount(String query){
         Map<String, String> map = queryToMap(query);
         return new Amount(map.get("passport"), Double.parseDouble(map.get("amount")), map.get("account"));

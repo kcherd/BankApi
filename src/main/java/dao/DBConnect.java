@@ -1,4 +1,4 @@
-package controller;
+package dao;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.tools.RunScript;
