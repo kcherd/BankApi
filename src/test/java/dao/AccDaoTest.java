@@ -28,7 +28,8 @@ public class AccDaoTest {
     @Test
     public void depositOfFunds_TRUE() throws Exception {
         boolean expected = accDao.depositOfFunds(555, "12345678901234567890");
-
+        double result = accDao.checkBalance("12345678901234567890");
+        Assert.assertEquals(result, 1555, 0.01);
         Assert.assertTrue(expected);
     }
 
@@ -40,6 +41,9 @@ public class AccDaoTest {
     @Test
     public void newCard_TRUE() throws Exception {
         boolean expected = accDao.newCard("12345678901234567890");
+        ClientsDao clientsDao = new ClientsDao(connection);
+        int count = clientsDao.getCards("1234567890").size();
+        Assert.assertEquals(count, 3);
 
         Assert.assertTrue(expected);
     }

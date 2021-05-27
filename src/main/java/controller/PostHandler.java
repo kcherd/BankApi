@@ -7,7 +7,6 @@ import model.InData;
 import model.Passport;
 
 import java.io.*;
-import java.sql.Connection;
 
 /**
  * Класс для обработки post запросов
@@ -20,8 +19,6 @@ public class PostHandler extends Handlers{
     public PostHandler(){
         super();
     }
-
-    public PostHandler(Connection connection) {super(connection);}
 
     /**
      * процедура, обрабатывающия http запросы

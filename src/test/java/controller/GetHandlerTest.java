@@ -5,53 +5,96 @@ import model.Account;
 import model.Amount;
 import model.Passport;
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
-import static io.restassured.config.JsonConfig.jsonConfig;
-import static io.restassured.path.json.config.JsonPathConfig.NumberReturnType.DOUBLE;
 import static org.hamcrest.Matchers.*;
 
 public class GetHandlerTest {
-    GetHandler getHandler;
+    private GetHandler getHandler;
+    private Connection connection;
+
+    @BeforeClass
+    public static void Init() {
+        BankServer.startServer();
+    }
 
     @Before
-    public void Init() throws SQLException {
-        JdbcConnectionPool connectionPool = DBConnect.getConnectionPool();
-        Connection connection = connectionPool.getConnection();
+    public void initMethods() throws SQLException {
+        connection = DBConnect.getConnectionPool().getConnection();
         getHandler = new GetHandler(connection);
     }
 
+    @Test public void
+    handler_Cards(){
+        String actual = "[{\"num\":1234567890123458,\"accNum\":\"12345678901214567890\",\"balance\":1543.0},{\"num\":1234567890123459,\"accNum\":\"12345678901234567891\",\"balance\":85743.0}]";
+        given().get("http://localhost:8080/cards?passport=0987654321")
+                .then()
+                .body(equalTo(actual));
+    }
+
+    @Test public void
+    handler_Cards_Error(){
+       // BankServer.startServer();
+        given().get("http://localhost:8080/cards?passport=1234567891")
+                .then().
+                body("error", equalTo("No user with such data"));
+    }
 
     @Test public void
     handle_New() {
-        BankServer.startServer();
-        when().get("http://localhost:8080/new?passport=1234567890&account=12345678901234567890")
-                .then().statusCode(200)
-                .assertThat().body("result", equalTo(true));
+        //BankServer.startServer();
+        given().get("http://localhost:8080/new?passport=1234567890&account=12345678901234567890")
+                .then().
+                body("result", equalTo(true));
+    }
+
+    @Test public void
+    handle_New_Error() {
+        given().get("http://localhost:8080/new?passport=1234567891&account=12345678901234567890")
+                .then()
+                .body("error", equalTo("No user with such data"));
     }
 
     @Test public void
     handle_balance() {
-        BankServer.startServer();
-        when().get("http://localhost:8080/balance?passport=1234567890&account=12345678901234567890")
-                .then().statusCode(200)
-                .assertThat().body("result", is(1000F));
+        given().get("http://localhost:8080/balance?passport=1234567890&account=12345678901234567890")
+                .then()
+                .body("result", is(1000F));
+    }
+
+    @Test public void
+    handle_balance_Error() {
+        given().get("http://localhost:8080/balance?passport=1234567890&account=12345678901234567891")
+                .then()
+                .body("error", equalTo("No access to account"));
     }
 
     @Test public void
     handler_deposit(){
-        BankServer.startServer();
-        when().get("http://localhost:8080/deposit?passport=1234567890&amount=6473&account=12345678901234567890")
-                .then().statusCode(200)
-                .assertThat().body("result", is(true));
+        given().get("http://localhost:8080/deposit?passport=1234567890&amount=6473&account=12345678901234567890")
+                .then()
+                .body("result", is(true));
+    }
+
+    @Test public void
+    handler_deposit_Error(){
+        given().get("http://localhost:8080/deposit?passport=1234567890&amount=-1&account=12345678901234567890")
+                .then()
+                .body("error", equalTo("Amount < 0"));
+    }
+
+    @Test public void
+    handler_errorPage(){
+        given().get("http://localhost:8080/test?rtr=12")
+                .then().
+                body("error", equalTo("The page does not exist"));
     }
 
     @Test
@@ -102,5 +145,15 @@ public class GetHandlerTest {
         String expected = getHandler.action("elboen");
 
         Assert.assertNull(expected);
+    }
+
+    @After
+    public void stopConn() throws SQLException {
+        connection.close();
+    }
+
+    @AfterClass
+    public static void stopServer(){
+        BankServer.stopServer();
     }
 }

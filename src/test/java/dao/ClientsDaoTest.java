@@ -2,6 +2,7 @@ package dao;
 
 import model.Card;
 import model.Client;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,10 +29,10 @@ public class ClientsDaoTest {
     @Test
     public void getCards() throws Exception {
         List<Card> actual = new ArrayList<>();
-        actual.add(new Card(1234567890123456L, "12345678901234567890", 1000));
-        actual.add(new Card(1234567890123457L, "09876543210987654321", 120000));
+        actual.add(new Card(1234567890123458L, "12345678901214567890", 1543));
+        actual.add(new Card(1234567890123459L, "12345678901234567891", 85743));
 
-        List<Card> expected = clientsDao.getCards("1234567890");
+        List<Card> expected = clientsDao.getCards("0987654321");
 
         Assert.assertEquals(expected, actual);
     }
@@ -61,7 +62,7 @@ public class ClientsDaoTest {
 
     @Test
     public void depositOfFunds() throws Exception {
-        boolean result = clientsDao.depositOfFunds("1234567890", 12345, "12345678901234567890");
+        boolean result = clientsDao.depositOfFunds("1234567890", 12345, "09876543210987654321");
         Assert.assertTrue(result);
     }
 
@@ -89,5 +90,10 @@ public class ClientsDaoTest {
     @Test(expected = Exception.class)
     public void newCard_Exception_NoAccess() throws Exception {
         clientsDao.newCard("1234567890", "12345678901234567899");
+    }
+
+    @After
+    public void closeConn() throws SQLException {
+        connection.close();
     }
 }

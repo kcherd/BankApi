@@ -20,3 +20,12 @@ insert into cards values (3, 1234567890123458, 3);
 insert into cards values (4, 1234567890123459, 4);
 insert into cards values (5, 1234567890123450, 5);
 insert into cards values (6, 1234567890123451, 5);
+
+insert into counterparty values (1, 123456789012, 0987654321098);
+insert into counterparty values (2, 123456789013, 0987654321097);
+
+insert into counterparty_acc values (1, '41234567890987654321', 123493, 1);
+insert into counterparty_acc values (2, '41234567890987654322', 30000, 2);
+
+insert into client_counterparty values (1, 1, 1);
+insert into client_counterparty values (2, 2, 2);

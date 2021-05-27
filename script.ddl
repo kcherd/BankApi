@@ -27,3 +27,32 @@ create table if not exists CARDS
         references BANK_ACCOUNT,
     unique (NUM)
 );
+
+create table if not exists COUNTERPARTY
+(
+    ID BIGINT auto_increment not null
+        primary key,
+    INN bigint,
+    OGRN bigint,
+    unique (INN), unique (OGRN)
+);
+
+create table if not exists COUNTERPARTY_ACC
+(
+    ID BIGINT auto_increment not null primary key,
+    NUM varchar(20),
+    BALANCE double,
+    ID_COUNTERPARTY BIGINT references COUNTERPARTY (ID) on delete cascade,
+    unique (NUM)
+);
+
+create table if not exists CLIENT_COUNTERPARTY
+(
+    ID BIGINT auto_increment not null primary key,
+    ID_CLIENT bigint references CLIENTS (id) on delete cascade,
+    ID_COUNTERPARTY bigint references COUNTERPARTY (id) on delete cascade
+);
+
+create index passport_index on CLIENTS (PASSPORT_ID);
+create index acc_index on BANK_ACCOUNT (NUM);
+create index num_index on CARDS (NUM);

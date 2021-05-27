@@ -19,7 +19,7 @@ public class BankServer {
     /**
      *  Приватный конструктор класса, чтобы создавать только один экземпляр сервера
      */
-    BankServer(){ }
+    private BankServer(){ }
 
     /**
      * Процедура для старта и запуска сервера
@@ -50,5 +50,10 @@ public class BankServer {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void stopServer(){
+        DBConnect.closeConnection(connectionPool);
+        server.stop(0);
     }
 }
