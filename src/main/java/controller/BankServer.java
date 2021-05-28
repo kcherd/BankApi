@@ -27,7 +27,7 @@ public class BankServer {
      */
     public static void startServer(){
         try {
-            connectionPool = DBConnect.getConnectionPool();
+            //connectionPool = DBConnect.getConnectionPool();
 
             server = HttpServer.create();
             server.bind(new InetSocketAddress(8080), 10);
@@ -37,6 +37,10 @@ public class BankServer {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    public static void createPool(){
+        connectionPool = DBConnect.getConnectionPool();
     }
 
     /**
@@ -52,8 +56,12 @@ public class BankServer {
         return null;
     }
 
+    public static void disposePool(){
+        connectionPool.dispose();
+    }
+
     public static void stopServer(){
-        DBConnect.closeConnection(connectionPool);
+        //DBConnect.closeConnection(connectionPool);
         server.stop(0);
     }
 }

@@ -1,10 +1,8 @@
 package controller;
 
-import dao.DBConnect;
 import model.Account;
 import model.Amount;
 import model.Passport;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.*;
 
 import java.sql.Connection;
@@ -13,22 +11,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.*;
 
 public class GetHandlerTest {
     private GetHandler getHandler;
-    private Connection connection;
+    //private Connection connection;
 
     @BeforeClass
     public static void Init() {
+        BankServer.createPool();
         BankServer.startServer();
     }
 
     @Before
     public void initMethods() throws SQLException {
-        connection = DBConnect.getConnectionPool().getConnection();
-        getHandler = new GetHandler(connection);
+        //connection = BankServer.getConnection();
+        getHandler = new GetHandler();
     }
 
     @Test public void
@@ -41,7 +39,6 @@ public class GetHandlerTest {
 
     @Test public void
     handler_Cards_Error(){
-       // BankServer.startServer();
         given().get("http://localhost:8080/cards?passport=1234567891")
                 .then().
                 body("error", equalTo("No user with such data"));
@@ -49,7 +46,6 @@ public class GetHandlerTest {
 
     @Test public void
     handle_New() {
-        //BankServer.startServer();
         given().get("http://localhost:8080/new?passport=1234567890&account=12345678901234567890")
                 .then().
                 body("result", equalTo(true));
@@ -147,10 +143,10 @@ public class GetHandlerTest {
         Assert.assertNull(expected);
     }
 
-    @After
-    public void stopConn() throws SQLException {
-        connection.close();
-    }
+//    @After
+//    public void stopConn() throws SQLException {
+//        connection.close();
+//    }
 
     @AfterClass
     public static void stopServer(){

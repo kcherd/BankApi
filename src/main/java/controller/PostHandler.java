@@ -90,13 +90,13 @@ public class PostHandler extends Handlers{
      */
     public InData parseInputStream(HttpExchange exchange, InData format) throws IOException {
         InputStream inputStream = exchange.getRequestBody();
-        System.out.println(exchange.getRequestBody());
+        //System.out.println(exchange.getRequestBody());
         int ch;
         StringBuilder sb = new StringBuilder();
         while ((ch = inputStream.read()) != -1){
             sb.append((char) ch);
         }
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
 
         format = gson.fromJson(sb.toString(), format.getClass());
         return format;

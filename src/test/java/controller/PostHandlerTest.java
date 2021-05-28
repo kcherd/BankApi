@@ -9,13 +9,14 @@ public class PostHandlerTest {
 
     @BeforeClass
     public static void Init(){
+        BankServer.createPool();
         BankServer.startServer();
     }
 
     @Test public void
     handler_cards_result(){
-        String actual = "[{\"num\":1234567890123458,\"accNum\":\"12345678901214567890\",\"balance\":1543.0},{\"num\":1234567890123459,\"accNum\":\"12345678901234567891\",\"balance\":85743.0}]";
-        given().body("{\"passport\":\"0987654321\"}")
+        String actual = "[{\"num\":2234567890123451,\"accNum\":\"72345678101239567890\",\"balance\":3000.0}]";
+        given().body("{\"passport\":\"9876546372\"}")
                 .post("http://localhost:8080/client/cards/result")
                 .then()
                 .body(equalTo(actual));
@@ -47,10 +48,10 @@ public class PostHandlerTest {
 
     @Test public void
     handler_balance_result() {
-        given().body("{\"passport\":\"1234567890\",\"account\":\"12345678901234567890\"}").when()
+        given().body("{\"passport\":\"9876546372\",\"account\":\"72345678101239567890\"}").when()
                 .post("http://localhost:8080/client/balance/result")
                 .then()
-                .body("result", equalTo(1000F));
+                .body("result", equalTo(3000F));
     }
 
     @Test public void

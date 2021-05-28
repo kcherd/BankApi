@@ -5,7 +5,6 @@ import model.Account;
 import model.Amount;
 import model.Passport;
 
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -21,10 +20,6 @@ public class GetHandler extends Handlers{
      */
     public GetHandler(){
         super();
-    }
-
-    public GetHandler(Connection connection){
-        super(connection);
     }
 
     /**

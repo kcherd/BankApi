@@ -1,8 +1,8 @@
 package dao;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import controller.BankServer;
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.junit.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,25 +11,35 @@ public class AccDaoTest {
     private Connection connection;
     private AccDao accDao;
 
+    @BeforeClass
+    public static void Init() {
+        BankServer.createPool();
+        BankServer.startServer();
+    }
+
     @Before
     public void getConnection() throws SQLException {
-        connection = DBConnect.getConnectionPool().getConnection();
-        accDao = new AccDao(connection);
+        connection = BankServer.getConnection();
+        accDao = new AccDao();
+        accDao.setConnection(connection);
     }
 
     @Test
     public void checkBalance() throws Exception {
-        double actual = 1000;
-        double expected = accDao.checkBalance("12345678901234567890");
+        double actual = 40000;
+        double expected = accDao.checkBalance("82345678101239567890");
 
         Assert.assertEquals(expected, actual, 0.01);
     }
 
     @Test
     public void depositOfFunds_TRUE() throws Exception {
-        boolean expected = accDao.depositOfFunds(555, "12345678901234567890");
-        double result = accDao.checkBalance("12345678901234567890");
-        Assert.assertEquals(result, 1555, 0.01);
+
+        boolean expected = accDao.depositOfFunds(555, "32345678101239567890");
+        connection = BankServer.getConnection();
+        accDao.setConnection(connection);
+        double result = accDao.checkBalance("32345678101239567890");
+        Assert.assertEquals(result, 655, 0.01);
         Assert.assertTrue(expected);
     }
 
@@ -40,10 +50,12 @@ public class AccDaoTest {
 
     @Test
     public void newCard_TRUE() throws Exception {
-        boolean expected = accDao.newCard("12345678901234567890");
-        ClientsDao clientsDao = new ClientsDao(connection);
-        int count = clientsDao.getCards("1234567890").size();
-        Assert.assertEquals(count, 3);
+        boolean expected = accDao.newCard("32345678101239567888");
+        ClientsDao clientsDao = new ClientsDao();
+        connection = BankServer.getConnection();
+        clientsDao.setConnection(connection);
+        int count = clientsDao.getCards("2637483692").size();
+        Assert.assertEquals(count, 1);
 
         Assert.assertTrue(expected);
     }
@@ -67,5 +79,15 @@ public class AccDaoTest {
         long expected = accDao.findCardByNum(1234567890123450L);
 
         Assert.assertEquals(expected, actual);
+    }
+
+//    @After
+//    public void closeConn() throws SQLException {
+//        connection.close();
+//    }
+
+    @AfterClass
+    public static void stopServer(){
+        BankServer.stopServer();
     }
 }

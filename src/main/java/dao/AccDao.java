@@ -1,5 +1,7 @@
 package dao;
 
+import controller.BankServer;
+
 import java.sql.*;
 import java.util.Random;
 
@@ -7,14 +9,13 @@ import java.util.Random;
  * класс реализующий дейтсвия по счету с базой данных
  */
 public class AccDao {
-    private final Connection connection;
+    private Connection connection;
 
-    /**
-     * Конструктор - получает соединение с базой данных
-     * @param connection соединение с базой данных
-     */
-    public AccDao(Connection connection){
+    public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public AccDao(){
     }
 
     /**
@@ -37,6 +38,7 @@ public class AccDao {
         if(balance > 0) {
             return balance;
         }else{
+            connection.close();
             throw new Exception("Failed to check balance");
         }
     }
@@ -49,6 +51,7 @@ public class AccDao {
      */
     public boolean depositOfFunds(double amount, String accNum) throws Exception {
         if(amount < 0){
+            connection.close();
             throw new Exception("Amount < 0");
         }
         double balance = checkBalance(accNum);
@@ -65,6 +68,7 @@ public class AccDao {
         if(result == 1){
             return true;
         } else{
+            connection.close();
             throw new Exception("Failed to deposit funds into account");
         }
     }
@@ -79,6 +83,7 @@ public class AccDao {
         //проверем номер счета
         long accId = findAccByNum(accNum);
         if (accId < 0){
+            connection.close();
             throw new Exception("Account does not exist");
         }
 
@@ -106,6 +111,7 @@ public class AccDao {
         if(result > 0) {
             return true;
         }else{
+            connection.close();
             throw new Exception("Failed to create card");
         }
     }

@@ -5,6 +5,8 @@ insert into clients values (4, 'Мазаненко Анна Олеговна', '
 insert into clients values (5, 'Михайлова Ирина Игоревна', '9876546372');
 insert into clients values (6, 'Васильева Анфиса Геннадьевна', '9944663322');
 insert into clients values (7, 'Антонов Максим Николайевич', '4637483690');
+insert into clients values (8, 'Андреева Ангелина Олеговна', '2637483692');
+insert into clients values (9, 'Андерсен Дарья Анатольевна', '3637483693');
 
 insert into bank_account values (1, '12345678901234567890', 1000, 1);
 insert into bank_account values (2, '09876543210987654321', 120000, 1);
@@ -13,13 +15,24 @@ insert into bank_account values (4, '12345678901234567891', 85743, 2);
 insert into bank_account values (5, '12345678901239567890', 200000, 3);
 insert into bank_account values (6, '12345678941234567890', 49385, 3);
 insert into bank_account values (7, '12345678101239567890', 453245, 4);
+insert into bank_account values (8, '72345678101239567890', 3000, 5);
+insert into bank_account values (9, '82345678101239567890', 40000, 6);
+insert into bank_account values (10, '32345678101239567890', 100, 7);
+insert into bank_account values (11, '32345678101239567888', 1010, 8);
+insert into bank_account values (12, '32345678101239567877', 1111, 8);
+insert into bank_account values (13, '62345678101239566666', 2222, 9);
+insert into bank_account values (14, '62345678101239555555', 3333, 9);
 
 insert into cards values (1, 1234567890123456, 1);
 insert into cards values (2, 1234567890123457, 2);
 insert into cards values (3, 1234567890123458, 3);
 insert into cards values (4, 1234567890123459, 4);
 insert into cards values (5, 1234567890123450, 5);
-insert into cards values (6, 1234567890123451, 5);
+insert into cards values (6, 1234567890123451, 6);
+insert into cards values (7, 2234567890123451, 8);
+insert into cards values (8, 3334567890123451, 13);
+insert into cards values (9, 5534567890123451, 14);
+
 
 insert into counterparty values (1, 123456789012, 0987654321098);
 insert into counterparty values (2, 123456789013, 0987654321097);

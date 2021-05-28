@@ -16,17 +16,16 @@ import java.util.List;
 public class ClientsDao {
     private Connection connection;
     private Client client;
-    private AccDao accDao;
+    private AccDao accDao = new AccDao();
     private String noUser = "No user with such data";
     private String noAccess = "No access to account";
 
-    /**
-     * конструктор - получает соединение с базой данных
-     * @param connection соединение с базой данных
-     */
-    public ClientsDao(Connection connection){
+    public ClientsDao(){
+    }
+
+    public void setConnection(Connection connection) {
         this.connection = connection;
-        accDao = new AccDao(connection);
+        accDao.setConnection(connection);
     }
 
     /**
@@ -63,6 +62,7 @@ public class ClientsDao {
     public List<Card> getCards(String passport) throws Exception {
         long id = checkClient(passport);
         if(id < 0){
+            connection.close();
             throw new Exception(noUser);
         }
 
@@ -85,10 +85,12 @@ public class ClientsDao {
 
         resultSet.close();
         preparedStatement.close();
+        connection.close();
 
         if(cards.size() > 0) {
             return cards;
         }else{
+            connection.close();
             throw new Exception("The user does not have any cards");
         }
     }
@@ -103,12 +105,16 @@ public class ClientsDao {
     public double checkBalance(String passport, String accNum) throws Exception {
         long id = checkClient(passport);
         if(id < 0){
+            connection.close();
             throw new Exception(noUser);
         }
 
         if(getIdAccByNum(accNum) > 0){
-            return accDao.checkBalance(accNum);
+            double res = accDao.checkBalance(accNum);
+            connection.close();
+            return res;
         }else{
+            connection.close();
             throw new Exception(noAccess);
         }
     }
@@ -124,12 +130,16 @@ public class ClientsDao {
     public boolean depositOfFunds(String passport, double amount, String accNum) throws Exception {
         long id = checkClient(passport);
         if(id < 0){
+            connection.close();
             throw new Exception(noUser);
         }
 
         if(getIdAccByNum(accNum) > 0){
-            return accDao.depositOfFunds(amount, accNum);
+            boolean res = accDao.depositOfFunds(amount, accNum);
+            connection.close();
+            return res;
         }else{
+            connection.close();
             throw new Exception(noAccess);
         }
     }
@@ -144,12 +154,16 @@ public class ClientsDao {
     public boolean newCard(String passport, String accNum) throws Exception {
         long id = checkClient(passport);
         if(id < 0){
+            connection.close();
             throw new Exception(noUser);
         }
 
         if(getIdAccByNum(accNum) > 0){
-            return accDao.newCard(accNum);
+            boolean res = accDao.newCard(accNum);
+            connection.close();
+            return res;
         }else{
+            connection.close();
             throw new Exception(noAccess);
         }
     }
@@ -170,6 +184,9 @@ public class ClientsDao {
         if(resultSet.next()){
             id = resultSet.getLong("id");
         }
+
+        resultSet.close();
+        preparedStatement.close();
 
         return id;
     }
