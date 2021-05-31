@@ -30,6 +30,10 @@ public class DBConnect {
         return connectionPool;
     }
 
+    public static Connection getConnection() throws SQLException {
+        return connectionPool.getConnection();
+    }
+
     /**
      * процедура созания и заполнения таблиц базы данных
      */
