@@ -38,12 +38,12 @@ public class DBConnect {
      * процедура созания и заполнения таблиц базы данных
      */
     private static void initDB(){
-        try {
-            Connection conn = connectionPool.getConnection();
+        try(Connection conn = connectionPool.getConnection()) {
             //запускаем скрипт создания таблиц
             String schemaResourceName = "script.ddl";
             FileReader fileReader = new FileReader(schemaResourceName);
             RunScript.execute(conn, fileReader);
+
             //запускаем скрипт заполения таблиц
             String queryResourceFile = "dmlScript.dml";
             FileReader fileReader1 = new FileReader(queryResourceFile);

@@ -8,7 +8,6 @@ import model.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -40,7 +39,6 @@ public abstract class Handlers implements HttpHandler {
      * возвращает true, если карта создана и страницу с ошибкой, если карта не создана
      */
     public String newCard(Account account) throws Exception {
-        clientsDao.setConnection(BankServer.getConnection());
         Result result = new Result(clientsDao.newCard(account.getPassport(), account.getAccount()));
         return gson.toJson(result);
     }
@@ -51,7 +49,6 @@ public abstract class Handlers implements HttpHandler {
      * возвращает json объект со спискои карт пользователя или описание ошибки
      */
     public String allCards(Passport passport) throws Exception {
-        clientsDao.setConnection(BankServer.getConnection());
         List<Card> cards = clientsDao.getCards(passport.getPassport());
         return gson.toJson(cards);
     }
@@ -62,7 +59,6 @@ public abstract class Handlers implements HttpHandler {
      * выводит баланс или информацию об ошибке
      */
     public String balance(Account account) throws Exception {
-        clientsDao.setConnection(BankServer.getConnection());
         Result result = new Result(clientsDao.checkBalance(account.getPassport(), account.getAccount()));
         return gson.toJson(result);
     }
@@ -73,7 +69,6 @@ public abstract class Handlers implements HttpHandler {
      * выводит true или сообщение об ошибке
      */
     public String deposit(Amount amount) throws Exception {
-        clientsDao.setConnection(BankServer.getConnection());
         Result result = new Result(clientsDao.depositOfFunds(amount.getPassport(), amount.getAmount(), amount.getAccount()));
         return gson.toJson(result);
     }

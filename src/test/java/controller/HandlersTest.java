@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import model.*;
 import org.junit.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 

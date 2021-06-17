@@ -6,8 +6,6 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  *  Класс, отвечающий за создание и запуск сервера
@@ -41,19 +39,6 @@ public class BankServer {
 
     public static void createPool(){
         connectionPool = DBConnect.getConnectionPool();
-    }
-
-    /**
-     * Функция получения соединения с базой данных
-     * @return возвращает соединение из пула соединенй
-     */
-    public static Connection getConnection(){
-        try {
-            return connectionPool.getConnection();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static void disposePool(){

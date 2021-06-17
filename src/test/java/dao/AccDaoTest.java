@@ -1,14 +1,11 @@
 package dao;
 
 import controller.BankServer;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.*;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class AccDaoTest {
-    private Connection connection;
     private AccDao accDao;
 
     @BeforeClass
@@ -18,10 +15,8 @@ public class AccDaoTest {
     }
 
     @Before
-    public void getConnection() throws SQLException {
-        connection = BankServer.getConnection();
+    public void initBeforeMethod() {
         accDao = new AccDao();
-        accDao.setConnection(connection);
     }
 
     @Test
@@ -36,8 +31,6 @@ public class AccDaoTest {
     public void depositOfFunds_TRUE() throws Exception {
 
         boolean expected = accDao.depositOfFunds(555, "32345678101239567890");
-        connection = BankServer.getConnection();
-        accDao.setConnection(connection);
         double result = accDao.checkBalance("32345678101239567890");
         Assert.assertEquals(result, 655, 0.01);
         Assert.assertTrue(expected);
@@ -52,8 +45,6 @@ public class AccDaoTest {
     public void newCard_TRUE() throws Exception {
         boolean expected = accDao.newCard("32345678101239567888");
         ClientsDao clientsDao = new ClientsDao();
-        connection = BankServer.getConnection();
-        clientsDao.setConnection(connection);
         int count = clientsDao.getCards("2637483692").size();
         Assert.assertEquals(count, 1);
 

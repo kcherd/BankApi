@@ -2,18 +2,12 @@ package dao;
 
 import controller.BankServer;
 import model.Card;
-import model.Client;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClientsDaoTest {
-    //private JdbcConnectionPool pool = DBConnect.getConnectionPool();
-    private Connection connection;
     private ClientsDao clientsDao;
 
     @BeforeClass
@@ -23,10 +17,8 @@ public class ClientsDaoTest {
     }
 
     @Before
-    public void createConnection() throws SQLException {
-            connection = BankServer.getConnection();
-            clientsDao = new ClientsDao();
-            clientsDao.setConnection(connection);
+    public void createDAO() {
+        clientsDao = new ClientsDao();
     }
 
     @Test

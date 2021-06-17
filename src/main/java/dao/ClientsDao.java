@@ -14,18 +14,18 @@ import java.util.List;
  * класс реализующий действия клиента по своим счетам с базой данных
  */
 public class ClientsDao {
-    private Connection connection;
     private Client client;
     private AccDao accDao = new AccDao();
     private String noUser = "No user with such data";
     private String noAccess = "No access to account";
 
-    public ClientsDao(){
-    }
+    private static final String CHECK_CLIENT = "select * from clients where passport_id = ?";
+    private static final String GET_CARDS = "select cards.num cn, bank_account.num an, bank_account.balance " +
+            "from clients join bank_account on clients.id = bank_account.id_user " +
+            "join cards on bank_account.id = cards.acc_id where clients.id = ?";
+    private static final String GET_ID_ACC_BY_NUM = "select id from bank_account where num = ? and id_user = ?";
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-        accDao.setConnection(connection);
+    public ClientsDao(){
     }
 
     /**
@@ -35,20 +35,19 @@ public class ClientsDao {
      */
     private long checkClient(String passport) throws Exception {
         long id = -1;
-        PreparedStatement preparedStatement = connection.prepareStatement("select * from clients where passport_id = ?");
-        preparedStatement.setString(1, passport);
-        ResultSet resultSet = preparedStatement.executeQuery();
 
-        if(resultSet.next()){
-            client = new Client();
-            id = resultSet.getLong("id");
-            client.setId(id);
-            client.setFio(resultSet.getString("fio"));
-            client.setPassport(passport);
+        try(Connection connection = DBConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(CHECK_CLIENT)){
+            preparedStatement.setString(1, passport);
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                if(resultSet.next()){
+                    client = new Client();
+                    id = resultSet.getLong("id");
+                    client.setId(id);
+                    client.setFio(resultSet.getString("fio"));
+                    client.setPassport(passport);
+                }
+            }
         }
-
-        resultSet.close();
-        preparedStatement.close();
 
         return id;
     }
@@ -62,35 +61,27 @@ public class ClientsDao {
     public List<Card> getCards(String passport) throws Exception {
         long id = checkClient(passport);
         if(id < 0){
-            connection.close();
             throw new Exception(noUser);
         }
 
         List<Card> cards = new ArrayList<>();
 
-        PreparedStatement preparedStatement = connection.prepareStatement(
-                "select cards.num cn, bank_account.num an, bank_account.balance " +
-                        "from clients join bank_account on clients.id = bank_account.id_user " +
-                        "join cards on bank_account.id = cards.acc_id where clients.id = ?");
-        preparedStatement.setLong(1, client.getId());
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        while (resultSet.next()){
-            Card card = new Card();
-            card.setNum(resultSet.getLong("cn"));
-            card.setAccNum(resultSet.getString("an"));
-            card.setBalance(resultSet.getDouble("balance"));
-            cards.add(card);
+        try(Connection connection = DBConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(GET_CARDS)){
+            preparedStatement.setLong(1, client.getId());
+            try(ResultSet resultSet = preparedStatement.executeQuery();){
+                while (resultSet.next()){
+                    Card card = new Card();
+                    card.setNum(resultSet.getLong("cn"));
+                    card.setAccNum(resultSet.getString("an"));
+                    card.setBalance(resultSet.getDouble("balance"));
+                    cards.add(card);
+                }
+            }
         }
-
-        resultSet.close();
-        preparedStatement.close();
-        connection.close();
 
         if(cards.size() > 0) {
             return cards;
         }else{
-            connection.close();
             throw new Exception("The user does not have any cards");
         }
     }
@@ -103,18 +94,13 @@ public class ClientsDao {
      * @throws Exception
      */
     public double checkBalance(String passport, String accNum) throws Exception {
-        long id = checkClient(passport);
-        if(id < 0){
-            connection.close();
+        if(checkClient(passport) < 0){
             throw new Exception(noUser);
         }
 
         if(getIdAccByNum(accNum) > 0){
-            double res = accDao.checkBalance(accNum);
-            connection.close();
-            return res;
+            return accDao.checkBalance(accNum);
         }else{
-            connection.close();
             throw new Exception(noAccess);
         }
     }
@@ -128,18 +114,13 @@ public class ClientsDao {
      * @throws Exception
      */
     public boolean depositOfFunds(String passport, double amount, String accNum) throws Exception {
-        long id = checkClient(passport);
-        if(id < 0){
-            connection.close();
+        if(checkClient(passport) < 0){
             throw new Exception(noUser);
         }
 
         if(getIdAccByNum(accNum) > 0){
-            boolean res = accDao.depositOfFunds(amount, accNum);
-            connection.close();
-            return res;
+            return accDao.depositOfFunds(amount, accNum);
         }else{
-            connection.close();
             throw new Exception(noAccess);
         }
     }
@@ -152,18 +133,13 @@ public class ClientsDao {
      * @throws Exception
      */
     public boolean newCard(String passport, String accNum) throws Exception {
-        long id = checkClient(passport);
-        if(id < 0){
-            connection.close();
+        if(checkClient(passport) < 0){
             throw new Exception(noUser);
         }
 
         if(getIdAccByNum(accNum) > 0){
-            boolean res = accDao.newCard(accNum);
-            connection.close();
-            return res;
+            return accDao.newCard(accNum);
         }else{
-            connection.close();
             throw new Exception(noAccess);
         }
     }
@@ -176,17 +152,15 @@ public class ClientsDao {
     private long getIdAccByNum(String accNum) throws SQLException {
         long id = -1;
 
-        PreparedStatement preparedStatement = connection.prepareStatement("select id from bank_account where num = ? and id_user = ?");
-        preparedStatement.setString(1, accNum);
-        preparedStatement.setLong(2, client.getId());
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        if(resultSet.next()){
-            id = resultSet.getLong("id");
+        try(Connection connection = DBConnect.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(GET_ID_ACC_BY_NUM)){
+            preparedStatement.setString(1, accNum);
+            preparedStatement.setLong(2, client.getId());
+            try(ResultSet resultSet = preparedStatement.executeQuery()){
+                if(resultSet.next()){
+                    id = resultSet.getLong("id");
+                }
+            }
         }
-
-        resultSet.close();
-        preparedStatement.close();
 
         return id;
     }
